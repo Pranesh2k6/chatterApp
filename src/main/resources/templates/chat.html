@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${otherUser != null} ? 'Chat with ' + ${otherUser.username} + ' – ChatterApp' : 'Chat – ChatterApp'">Chat – ChatterApp</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="app-body">
+    <nav class="top-bar">
+        <a th:href="@{/chat}" class="nav-brand">ChatterApp</a>
+        <div class="nav-links">
+            <a th:href="@{/search}">Search</a>
+            <form method="post" th:action="@{/logout}" class="inline-form">
+                <button type="submit" class="btn btn-sm btn-outline">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="chat-layout">
+
+        <!-- ===== SIDEBAR (iframe, refreshes every 3 s) ===== -->
+        <div class="sidebar-frame">
+            <iframe th:src="${conversationId != null}
+                        ? @{/iframe/sidebar(active=${conversationId})}
+                        : @{/iframe/sidebar}"
+                    class="sidebar-iframe"
+                    title="Conversations sidebar">
+            </iframe>
+        </div>
+
+        <!-- ===== MAIN PANE ===== -->
+        <div class="main-pane">
+
+            <!-- No conversation selected -->
+            <div th:if="${conversationId == null}" class="empty-state">
+                <h2>Welcome to ChatterApp</h2>
+                <p>Select a conversation from the sidebar, or
+                   <a th:href="@{/search}">search for a user</a> to start chatting.</p>
+            </div>
+
+            <!-- Conversation selected -->
+            <div th:if="${conversationId != null}" class="conversation-view">
+
+                <!-- Chat header: other user's name and status -->
+                <div class="chat-header">
+                    <span class="status-dot"
+                          th:classappend="${otherUser.online} ? 'online' : 'offline'"></span>
+                    <span class="chat-with" th:text="${otherUser.username}">Other User</span>
+                    <span class="last-seen" th:if="${!otherUser.online && otherUser.lastSeen != null}">
+                        – Last seen
+                        <span th:text="${#temporals.format(otherUser.lastSeen, 'dd MMM, HH:mm')}">time</span>
+                    </span>
+                    <span class="status-label online-label" th:if="${otherUser.online}">Online</span>
+                </div>
+
+                <!-- Messages iframe (refreshes every 2 s) -->
+                <div class="messages-frame">
+                    <iframe th:src="@{/iframe/messages/{id}(id=${conversationId}, limit=${limit})}"
+                            class="messages-iframe"
+                            title="Messages">
+                    </iframe>
+                </div>
+
+                <!-- Send form -->
+                <form method="post"
+                      th:action="@{/chat/{id}/send(id=${conversationId})}"
+                      class="send-form">
+                    <input type="hidden" name="limit" th:value="${limit}"/>
+                    <input type="text" name="content" placeholder="Type a message…"
+                           maxlength="1000" required autofocus autocomplete="off"/>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

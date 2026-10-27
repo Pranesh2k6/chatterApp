@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Search Users – ChatterApp</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="app-body">
+    <nav class="top-bar">
+        <a th:href="@{/chat}" class="nav-brand">ChatterApp</a>
+        <div class="nav-links">
+            <a th:href="@{/search}">Search</a>
+            <form method="post" th:action="@{/logout}" class="inline-form">
+                <button type="submit" class="btn btn-sm btn-outline">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="search-page">
+        <h2>Find Users</h2>
+
+        <!-- Search form (GET) -->
+        <form method="get" th:action="@{/search}" class="search-form">
+            <input type="text" name="q" th:value="${query}" placeholder="Search by username…"
+                   autofocus/>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <!-- Results -->
+        <div th:if="${query != null && !query.isEmpty()}">
+            <p th:if="${results.isEmpty()}" class="no-results">No users found.</p>
+
+            <ul class="user-list" th:unless="${results.isEmpty()}">
+                <li th:each="user : ${results}" class="user-item">
+                    <div class="user-info">
+                        <span class="status-dot"
+                              th:classappend="${user.online} ? 'online' : 'offline'"></span>
+                        <span class="user-name" th:text="${user.username}">username</span>
+                        <span class="last-seen" th:if="${!user.online && user.lastSeen != null}">
+                            Last seen
+                            <span th:text="${#temporals.format(user.lastSeen, 'dd MMM, HH:mm')}">time</span>
+                        </span>
+                    </div>
+                    <form method="post" th:action="@{/chat/start}" class="inline-form">
+                        <input type="hidden" name="otherUserId" th:value="${user.id}"/>
+                        <button type="submit" class="btn btn-sm btn-primary">Chat</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </main>
+</body>
+</html>

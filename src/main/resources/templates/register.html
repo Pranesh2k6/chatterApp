@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register – ChatterApp</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="auth-body">
+    <div class="auth-card">
+        <h1>ChatterApp</h1>
+        <h2>Create Account</h2>
+
+        <!-- Server-side duplicate error -->
+        <div th:if="${registrationError}" class="alert alert-error">
+            <span th:text="${registrationError}">Error</span>
+        </div>
+
+        <form method="post" th:action="@{/register}" th:object="${form}" class="auth-form">
+
+            <label for="username">Username</label>
+            <input type="text" id="username" th:field="*{username}" required
+                   placeholder="3–50 chars: letters, numbers, _"/>
+            <span class="field-error" th:if="${#fields.hasErrors('username')}"
+                  th:errors="*{username}">error</span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" th:field="*{email}" required
+                   placeholder="you@example.com"/>
+            <span class="field-error" th:if="${#fields.hasErrors('email')}"
+                  th:errors="*{email}">error</span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" th:field="*{password}" required
+                   placeholder="At least 8 characters"/>
+            <span class="field-error" th:if="${#fields.hasErrors('password')}"
+                  th:errors="*{password}">error</span>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required
+                   placeholder="Re-enter your password"/>
+            <span class="field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                  th:errors="*{confirmPassword}">error</span>
+
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </form>
+
+        <p class="auth-link">
+            Already have an account?
+            <a th:href="@{/login}">Sign in</a>
+        </p>
+    </div>
+</body>
+</html>

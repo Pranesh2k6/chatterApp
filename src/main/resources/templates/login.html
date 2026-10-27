@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login – ChatterApp</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="auth-body">
+    <div class="auth-card">
+        <h1>ChatterApp</h1>
+        <h2>Sign In</h2>
+
+        <!-- Success message after registration -->
+        <div th:if="${param.registered}" class="alert alert-success">
+            Registration successful! Please sign in.
+        </div>
+
+        <!-- Logout message -->
+        <div th:if="${param.logout}" class="alert alert-info">
+            You have been logged out.
+        </div>
+
+        <!-- Login error -->
+        <div th:if="${param.error}" class="alert alert-error">
+            Invalid username or password.
+        </div>
+
+        <!-- Spring Security form login -->
+        <form method="post" th:action="@{/login}" class="auth-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required autofocus
+                   placeholder="Enter your username"/>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required
+                   placeholder="Enter your password"/>
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+
+        <p class="auth-link">
+            Don't have an account?
+            <a th:href="@{/register}">Create one</a>
+        </p>
+    </div>
+</body>
+</html>

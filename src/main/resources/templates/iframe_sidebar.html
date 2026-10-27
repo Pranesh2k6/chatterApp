@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!-- Auto-refresh every 3 seconds -->
+    <meta http-equiv="refresh"
+          th:content="${activeConvId != null} ? '3;url=/iframe/sidebar?active=' + ${activeConvId} : '3;url=/iframe/sidebar'"/>
+    <!-- Links inside the iframe open in the parent (full) window -->
+    <base target="_top"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="iframe-body sidebar-body">
+
+    <!-- Notification sound (hidden audio, autoplay) -->
+    <audio th:if="${playSound}" autoplay>
+        <source th:src="@{/sounds/notify.mp3}" type="audio/mpeg"/>
+    </audio>
+
+    <!-- ===== Online Now section ===== -->
+    <div class="sidebar-section" th:unless="${onlineUsers.isEmpty()}">
+        <h3 class="sidebar-heading">Online Now</h3>
+        <ul class="sidebar-list">
+            <li th:each="user : ${onlineUsers}" class="sidebar-item online-item">
+                <form method="post" th:action="@{/chat/start}" class="sidebar-link-form">
+                    <input type="hidden" name="otherUserId" th:value="${user.id}"/>
+                    <button type="submit" class="sidebar-link-btn">
+                        <span class="status-dot online"></span>
+                        <span class="sidebar-username" th:text="${user.username}">user</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ===== Conversations ===== -->
+    <div class="sidebar-section">
+        <h3 class="sidebar-heading">Conversations</h3>
+
+        <p th:if="${summaries.isEmpty()}" class="sidebar-empty">No conversations yet.</p>
+
+        <ul class="sidebar-list" th:unless="${summaries.isEmpty()}">
+            <li th:each="s : ${summaries}"
+                class="sidebar-item"
+                th:classappend="(${s.unreadCount > 0} ? ' unread' : '') + (${activeConvId != null && s.conversationId == activeConvId} ? ' active' : '')">
+
+                <a th:href="@{/chat/{id}(id=${s.conversationId})}" class="sidebar-conv-link">
+                    <div class="sidebar-conv-top">
+                        <span class="status-dot"
+                              th:classappend="${s.otherUserOnline} ? 'online' : 'offline'"></span>
+                        <span class="sidebar-conv-name" th:text="${s.otherUsername}">user</span>
+                        <span class="sidebar-conv-time" th:if="${s.lastMessageTime != null}"
+                              th:text="${#temporals.format(s.lastMessageTime, 'HH:mm')}">12:00</span>
+                    </div>
+                    <div class="sidebar-conv-bottom">
+                        <span class="sidebar-preview"
+                              th:if="${s.lastMessageContent != null}"
+                              th:text="${#strings.abbreviate(s.lastMessageContent, 30)}">preview…</span>
+                        <span class="badge" th:if="${s.unreadCount > 0}"
+                              th:text="${s.unreadCount}">1</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>

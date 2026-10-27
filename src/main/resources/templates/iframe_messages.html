@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!-- Auto-refresh every 2 seconds, preserving the current limit -->
+    <meta http-equiv="refresh"
+          th:content="'2;url=/iframe/messages/' + ${convId} + '?limit=' + ${limit}"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="iframe-body messages-body">
+
+    <!-- "Load older messages" link -->
+    <div th:if="${hasOlder}" class="load-older">
+        <a th:href="@{/chat/{id}(id=${convId}, limit=${nextLimit})}" target="_top"
+           class="btn btn-sm btn-outline">↑ Load older messages</a>
+    </div>
+
+    <!--
+        Message container:
+        Uses column-reverse + overflow-y:auto so the scroll starts at the bottom (newest).
+        Messages are rendered newest-first in the DOM, but column-reverse flips the visual order.
+    -->
+    <div class="msg-container">
+        <div class="msg-list">
+            <div th:each="msg : ${messages}"
+                 class="msg-bubble"
+                 th:classappend="${msg.senderId == me.id} ? 'msg-mine' : 'msg-theirs'">
+                <div class="msg-meta">
+                    <span class="msg-sender" th:text="${msg.senderUsername}">User</span>
+                    <span class="msg-time"
+                          th:text="${msg.sentAt.toLocalDate().equals(T(java.time.LocalDate).now())}
+                                   ? ${#temporals.format(msg.sentAt, 'HH:mm')}
+                                   : ${#temporals.format(msg.sentAt, 'dd MMM, HH:mm')}">12:00</span>
+                </div>
+                <!--
+                    th:text escapes HTML automatically → XSS-safe.
+                    NEVER use th:utext for user content.
+                -->
+                <div class="msg-content" th:text="${msg.content}">message text</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
